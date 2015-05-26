@@ -5,15 +5,12 @@ type kickstart_exec, file_type, exec_type;
 init_daemon_domain(kickstart)
 
 # Run kickstart_checker.sh
-allow kickstart shell_exec:file { entrypoint read };
-allow kickstart kickstart_exec:file { getattr open execute_no_trans };
+allow kickstart shell_exec:file rx_file_perms;
+allow kickstart kickstart_exec:file rx_file_perms;
 
 # kickstart_checker.sh changes block devices
 # /dev/block/platform/msm_sdcc.1/by-name/m9kefs*
 allow kickstart self:capability { chown fowner };
-
-# Spawn /system/bin/efsks and /system/bin/ks
-allow kickstart kickstart_exec:file { open execute_no_trans getattr };
 
 # Let qcks access /dev/mdm node (modem driver)
 allow kickstart radio_device:chr_file r_file_perms;
@@ -41,8 +38,7 @@ allow kickstart system_file:file execute_no_trans;
 wakelock_use(kickstart)
 
 # Set property key gsm.radio.kickstart
-allow kickstart radio_prop:property_service set;
-unix_socket_connect(kickstart, property, init)
+set_prop(kickstart, radio_prop)
 
 # Access /sys/module/rmnet_usb/parameters/rmnet_data_init
 allow kickstart sysfs_rmnet:file w_file_perms;
